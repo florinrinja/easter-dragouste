@@ -1,12 +1,55 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import Phaser from 'phaser';
+import spriteSheet from './assets/spawn.png'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const config = {
+  type: Phaser.AUTO,
+  parent: "phaser-example",
+  width: 800,
+  height: 600,
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: false
+    }
+  },
+  scene: {
+    preload: preload,
+    create: create,
+    update: update
+  }
+};
+
+let cursors;
+let spawn;
+
+const game = new Phaser.Game(config);
+
+function preload() {
+  this.load.spritesheet('spawn', spriteSheet, { frameWidth: 32, frameHeight: 32 })
+}
+
+function create() {
+  const platform = this.physics.add.staticGroup();
+  spawn = this.physics.add.sprite(50, 80, 'spawn')
+
+  spawn.setCollideWorldBounds(true);
+
+  this.anims.create({
+    key: 'left',
+    frames: this.anims.generateFrameNumbers('spawn', { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  //  Input Events
+  cursors = this.input.keyboard.createCursorKeys();
+
+}
+
+function update() {
+  if (cursors.left.isDown) {
+    spawn.setVelocityX(-160);
+    spawn.anims.play('left', true);
+  }
+}
